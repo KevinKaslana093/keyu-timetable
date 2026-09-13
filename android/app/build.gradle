@@ -1,0 +1,19 @@
+plugins { id 'com.android.application' }
+android {
+    namespace 'org.keyu.timetable'
+    compileSdk 35
+    defaultConfig { applicationId 'org.keyu.timetable'; minSdk 26; targetSdk 35; versionCode 1; versionName '1.0.0' }
+    sourceSets { main { assets.srcDirs = ['../../dist'] } }
+    signingConfigs {
+        release {
+            if (System.getenv('KEYU_STORE_PASSWORD')) {
+                storeFile file(System.getenv('KEYU_KEYSTORE'))
+                storePassword System.getenv('KEYU_STORE_PASSWORD')
+                keyAlias 'keyu'
+                keyPassword System.getenv('KEYU_STORE_PASSWORD')
+                storeType 'PKCS12'
+            }
+        }
+    }
+    buildTypes { release { signingConfig signingConfigs.release; minifyEnabled false } }
+}

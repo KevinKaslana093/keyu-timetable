@@ -1,0 +1,13 @@
+node_modules/
+dist/
+.gradle/
+**/build/
+*.keystore
+*.jks
+*.apk
+local.properties
+.env*
+output/
+.playwright-cli/
+*.pdf
+private*

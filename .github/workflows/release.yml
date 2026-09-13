@@ -1,0 +1,46 @@
+name: Signed Android release
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Restore private signing key
+        env:
+          KEYSTORE: ${{ secrets.KEYU_KEYSTORE_BASE64 }}
+          STORE_PASSWORD: ${{ secrets.KEYU_STORE_PASSWORD }}
+        run: |
+          test -n "$KEYSTORE" && test -n "$STORE_PASSWORD"
+          printf '%s' "$KEYSTORE" | base64 --decode > "$RUNNER_TEMP/keyu.p12"
+      - name: Build signed APK
+        working-directory: android
+        env:
+          KEYU_KEYSTORE: ${{ runner.temp }}/keyu.p12
+          KEYU_STORE_PASSWORD: ${{ secrets.KEYU_STORE_PASSWORD }}
+        run: gradle --no-daemon assembleRelease
+      - name: Verify APK signature
+        run: "$ANDROID_HOME/build-tools/35.0.0/apksigner verify --verbose android/app/build/outputs/apk/release/app-release.apk"
+      - name: Publish prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp android/app/build/outputs/apk/release/app-release.apk keyu-1.0.0.apk
+          gh release create v1.0.0 keyu-1.0.0.apk --prerelease --title '课屿 1.0.0 体验版' --notes-file docs/RELEASE.md

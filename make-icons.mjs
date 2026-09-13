@@ -1,0 +1,6 @@
+import {deflateSync} from 'node:zlib';
+import {writeFile} from 'node:fs/promises';
+function crc(buf){let c=0xffffffff;for(const b of buf){c^=b;for(let i=0;i<8;i++)c=(c>>>1)^((c&1)?0xedb88320:0);}return (c^0xffffffff)>>>0;}
+function chunk(type,data){const t=Buffer.from(type),b=Buffer.alloc(12+data.length);b.writeUInt32BE(data.length);t.copy(b,4);data.copy(b,8);b.writeUInt32BE(crc(Buffer.concat([t,data])),8+data.length);return b;}
+function png(n){const data=Buffer.alloc((n*3+1)*n);for(let y=0;y<n;y++)for(let x=0;x<n;x++){const a=x/n,b=y/n;let col=[101,119,217];if((a>.24&&a<.76&&((b>.28&&b<.32)||(b>.70&&b<.74)))||(b>.28&&b<.74&&((a>.24&&a<.28)||(a>.72&&a<.76)))||(a>.24&&a<.76&&b>.40&&b<.44)||((Math.abs(a-.37)<.022||Math.abs(a-.63)<.022)&&b>.21&&b<.36))col=[255,255,255];if((a>.35&&a<.48&&Math.abs(b-(a+.20))<.025)||(a>.47&&a<.65&&Math.abs(b-(-a+1.15))<.025))col=[214,242,233];const i=y*(n*3+1)+1+x*3;data[i]=col[0];data[i+1]=col[1];data[i+2]=col[2];}const hdr=Buffer.alloc(13);hdr.writeUInt32BE(n);hdr.writeUInt32BE(n,4);hdr[8]=8;hdr[9]=2;return Buffer.concat([Buffer.from([137,80,78,71,13,10,26,10]),chunk('IHDR',hdr),chunk('IDAT',deflateSync(data)),chunk('IEND',Buffer.alloc(0))]);}
+for(const n of [192,512])await writeFile(`web/icon-${n}.png`,png(n));

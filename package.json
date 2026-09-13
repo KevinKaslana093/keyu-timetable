@@ -1,0 +1,25 @@
+{
+  "name": "keyu-timetable",
+  "version": "1.0.0",
+  "description": "Local-first timetable with SCUT PDF import and offline Android app",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "build": "node build.mjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "type": "module",
+  "dependencies": {
+    "pdfjs-dist": "^5.4.624",
+    "read-excel-file": "^9.3.10"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2"
+  }
+}
