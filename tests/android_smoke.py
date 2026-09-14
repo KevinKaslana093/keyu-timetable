@@ -4,6 +4,7 @@ out=pathlib.Path('android-smoke-output');out.mkdir(exist_ok=True)
 def adb(*args):
     return subprocess.check_output(['adb',*args],text=True)
 def snapshot(name):
+    adb('shell','rm','-f','/sdcard/keyu-ui.xml')
     adb('shell','uiautomator','dump','/sdcard/keyu-ui.xml')
     xml=adb('shell','cat','/sdcard/keyu-ui.xml')
     (out/(name+'.xml')).write_text(xml,encoding='utf8')
@@ -21,6 +22,7 @@ def wait_text(text,name):
 try:
     adb('install','-r','android/app/build/outputs/apk/debug/app-debug.apk')
     adb('shell','am','start','-n','org.keyu.timetable/.MainActivity')
+    time.sleep(4)
     xml=wait_text('看看示例','first-launch')
     node=next(n for n in ET.fromstring(xml).iter('node') if '看看示例' in n.attrib.get('text','') or '看看示例' in n.attrib.get('content-desc',''))
     x1,y1,x2,y2=map(int,re.findall(r'\d+',node.attrib['bounds']))
@@ -29,6 +31,7 @@ try:
     with (out/'demo.png').open('wb') as f:subprocess.run(['adb','exec-out','screencap','-p'],stdout=f,check=True)
     adb('shell','am','force-stop','org.keyu.timetable')
     adb('shell','am','start','-n','org.keyu.timetable/.MainActivity')
+    time.sleep(4)
     wait_text('虚构示例','after-restart')
     prefs=adb('shell','run-as','org.keyu.timetable','cat','shared_prefs/keyu.xml')
     assert '虚构示例' in prefs and '高等数学' in prefs, 'Native persistence failed'
