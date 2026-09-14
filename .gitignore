@@ -11,3 +11,4 @@ output/
 .playwright-cli/
 *.pdf
 private*
+work/

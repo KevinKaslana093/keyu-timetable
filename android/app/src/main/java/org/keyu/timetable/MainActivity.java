@@ -24,11 +24,14 @@ public class MainActivity extends Activity {
         getWindow().setNavigationBarColor(0xfff5f6fa);
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         web=new WebView(this);
-        setContentView(web);
-        web.setOnApplyWindowInsetsListener((v,insets)->{
+        android.widget.FrameLayout container=new android.widget.FrameLayout(this);
+        container.addView(web,new android.widget.FrameLayout.LayoutParams(-1,-1));
+        setContentView(container);
+        container.setOnApplyWindowInsetsListener((v,insets)->{
             if(Build.VERSION.SDK_INT>=30){android.graphics.Insets i=insets.getInsets(WindowInsets.Type.systemBars()|WindowInsets.Type.displayCutout());v.setPadding(i.left,i.top,i.right,i.bottom);}
             return insets;
         });
+        container.requestApplyInsets();
         WebSettings s=web.getSettings();s.setJavaScriptEnabled(true);s.setDomStorageEnabled(true);s.setAllowFileAccess(false);s.setAllowContentAccess(true);s.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);s.setSupportMultipleWindows(false);
         web.addJavascriptInterface(new Bridge(),"KeyuNative");
         web.setWebViewClient(new WebViewClient(){
