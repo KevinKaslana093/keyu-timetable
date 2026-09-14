@@ -1,6 +1,6 @@
 import {DAYS,COLORS,DEFAULT_SLOTS,uid,course,emptySchedule,validateSchedule,parseWeeks,formatWeeks,today,weekOf,addDays,onDate,events,conflicts,parseCSV,exportCSV,exportICS} from './core.js';
 import {readPDF} from './pdf.js';
-import readXlsxFile from 'read-excel-file/browser';
+import {readSheet as readXlsxFile} from 'read-excel-file/browser';
 const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const native=globalThis.KeyuNative;
 let state={version:1,active:'',schedules:[],theme:'auto'},view='week',week=1,pending=null,focusBefore=null;

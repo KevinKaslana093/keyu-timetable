@@ -9,8 +9,12 @@ def snapshot(name):
     (out/(name+'.xml')).write_text(xml,encoding='utf8')
     return xml
 def wait_text(text,name):
-    for n in range(12):
-        xml=snapshot(name)
+    for n in range(25):
+        try:
+            xml=snapshot(name)
+        except subprocess.CalledProcessError:
+            time.sleep(2)
+            continue
         if text in xml:return xml
         time.sleep(2)
     raise AssertionError('Screen did not contain '+text)
@@ -30,4 +34,5 @@ try:
     assert '虚构示例' in prefs and '高等数学' in prefs, 'Native persistence failed'
     print('PASS: Android 15 installation, offline local UI, fictional demo and persistence after restart')
 finally:
+    with (out/'last-screen.png').open('wb') as f:subprocess.run(['adb','exec-out','screencap','-p'],stdout=f)
     (out/'logcat.txt').write_text(adb('logcat','-d'),encoding='utf8')
