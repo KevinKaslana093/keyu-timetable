@@ -35,6 +35,8 @@ tapText('打开课表内页');
 await wait(()=>school.evaluate("location.host==='jw.scut.edu.cn'&&document.querySelector('iframe')?.contentDocument.querySelector('iframe')?.contentDocument.body?.textContent.includes('虚构海洋学')"));
 assert.equal(await school.evaluate('typeof KeyuNative'),'undefined');
 await delay(500);
+// Reproduce legacy DOM collections lacking iteration and NodeList.forEach.
+await school.evaluate("(function visit(w){Object.defineProperty(w.NodeList.prototype,Symbol.iterator,{value:undefined,configurable:true});Object.defineProperty(w.HTMLCollection.prototype,Symbol.iterator,{value:undefined,configurable:true});w.NodeList.prototype.forEach=undefined;for(let i=0;i<w.frames.length;i++)visit(w.frames[i]);})(window)");
 tapText('读取当前课表');
 await wait(()=>main.evaluate("document.querySelector('#import-form')!==null"));
 assert.equal(await main.evaluate("document.querySelectorAll('#modal tbody tr').length"),1);
