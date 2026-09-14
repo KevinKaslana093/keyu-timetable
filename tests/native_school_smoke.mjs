@@ -23,6 +23,7 @@ school.handlers.set('Fetch.requestPaused',async p=>{await school.call('Fetch.ful
 await school.call('Fetch.enable',{patterns:[{urlPattern:'*://*.scut.edu.cn/kbcx/keyu-fixture*',requestStage:'Request'}]});
 await school.call('Page.navigate',{url:'http://xsjw2018.jw.scut.edu.cn/kbcx/keyu-fixture'});
 await wait(()=>school.evaluate("document.querySelector('iframe')?.getAttribute('src')?.includes('keyu-fixture-inner')"));
+await wait(()=>school.evaluate("document.querySelector('iframe')?.contentDocument===null"));
 assert.equal(await school.evaluate("document.querySelector('iframe').contentDocument"),null,'Must reproduce a real cross-origin boundary');
 function tapText(text){adb('shell','rm','-f','/sdcard/keyu-test.xml');adb('shell','uiautomator','dump','/sdcard/keyu-test.xml');const xml=adb('shell','cat','/sdcard/keyu-test.xml');const tag=xml.match(new RegExp('<node[^>]*text="'+text+'"[^>]*>'))?.[0];assert.ok(tag,'Native button missing: '+text);const b=tag.match(/bounds="\[(\d+),(\d+)\]\[(\d+),(\d+)\]"/).slice(1).map(Number);adb('shell','input','tap',String((b[0]+b[2])>>1),String((b[1]+b[3])>>1));}
 tapText('读取当前课表');
