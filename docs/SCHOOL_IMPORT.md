@@ -56,3 +56,11 @@
 改用按索引复制 NodeList/HTMLCollection，不依赖 DOM 集合迭代器或 NodeList.forEach。仅文档访问的 SecurityError 计为 blockedFrames；其他错误仅记阶段和标准错误类型，诊断代码失败也不会跳过提取和子框架。诊断不包含异常原文。
 
 13 项单元测试、旧/新浏览器对照、嵌套表格和跨域回归通过。[Android 15 完整测试](https://github.com/KevinKaslana093/keyu-timetable/actions/runs/34857917916) 在移除 DOM 集合迭代支持后通过学校内页读取、预览、校区选择和保存。生产网页预览及两套校区时间回归通过，签名 APK 构建成功。仍需用户真实页面重试。
+
+## 1.1.4：提取阶段兼容修订
+
+用户新版诊断：blockedFrames=0、weekdayCells=14、cards=40、extract TypeError。可确认访问正常且提取阶段失败，不能仅凭异常类型确定具体调用。
+
+用虚构页面覆盖全局 Map，复现 1.1.3 在已读到课程块后抛出相同 extract TypeError。新读取器不依赖 Map/Set，使用数组保存列与去重记录；DOM 操作采用 parentNode/replaceChild/insertBefore/appendChild，避免旧环境缺少 closest/remove/replaceWith/prepend/append。诊断仅新增白名单步骤名称，不记录异常原文。
+
+13 项单元测试通过；Chrome 对照测试同时覆盖 Map 被替换和新版 DOM 方法缺失，修订后成功读取。[Android 15 完整测试](https://github.com/KevinKaslana093/keyu-timetable/actions/runs/34862648011) 通过：跨域内页、缺少 DOM 迭代器、Map 覆盖、缺少新版 DOM 方法 → 读取 → 预览 → 校区选择 → 保存。原有嵌套表格与跨域浏览器回归通过。真实用户设备仍需重试，测试不代表已确定其具体触发点。

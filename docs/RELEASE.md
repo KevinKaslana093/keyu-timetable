@@ -5,3 +5,5 @@
 诊断进一步标注表头、表格定位、课程文字或列位置步骤，不复制异常原文。已用虚构页面覆盖 Map 的方式复现 1.1.3 的 extract TypeError，同一页面在新版本读取成功；真实设备的具体触发点尚未直接验证。
 
 可覆盖安装保留课表。若仍失败，复制新版诊断；PDF 导入继续可用。
+
+验证：13 项单元测试、浏览器兼容对照和 Android 15 完整导入流程通过。https://github.com/KevinKaslana093/keyu-timetable/actions/runs/34862648011
