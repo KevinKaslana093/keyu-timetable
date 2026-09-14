@@ -10,6 +10,7 @@ if(path.dirname(outputDir)!==process.cwd()||path.basename(outputDir)!=='dist')th
 await rm(outputDir,{recursive:true,force:true});
 await mkdir(outputDir,{recursive:true});
 const bundle=await build({entryPoints:['web/app.js'],bundle:true,format:'esm',splitting:true,minify:true,outdir:'dist',target:'es2022',entryNames:'[name]-[hash]',chunkNames:'chunk-[hash]',metafile:true,define:{__KEYU_BUILD__:JSON.stringify(buildId)},plugins:[localFiles]});
+await build({entryPoints:['web/school-reader.js'],bundle:true,format:'iife',globalName:'KeyuSchoolReader',minify:true,outfile:'dist/school-reader.js',target:'es2018',plugins:[localFiles]});
 const entry=Object.entries(bundle.metafile.outputs).find(([file,data])=>data.entryPoint?.endsWith('web/app.js')||data.entryPoint?.endsWith('web\\app.js'))?.[0];
 if(!entry)throw Error('Application entry missing');
 await writeFile('dist/index.html',(await readFile('web/index.html','utf8')).replace('src="app.js"',`src="${path.basename(entry)}"`));

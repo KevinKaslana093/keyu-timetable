@@ -17,9 +17,12 @@ public class MainActivity extends Activity {
     private WebView web;
     private ValueCallback<Uri[]> picker;
     private byte[] exportBytes;
+    private boolean pageReady=false;
+    private String schoolResult;
     static final String ORIGIN="https://keyu.local/";
     @Override public void onCreate(Bundle b) {
         super.onCreate(b);
+        WebView.setWebContentsDebuggingEnabled((getApplicationInfo().flags&android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE)!=0);
         getWindow().setStatusBarColor(0xfff5f6fa);
         getWindow().setNavigationBarColor(0xfff5f6fa);
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
@@ -35,6 +38,7 @@ public class MainActivity extends Activity {
         WebSettings s=web.getSettings();s.setJavaScriptEnabled(true);s.setDomStorageEnabled(true);s.setAllowFileAccess(false);s.setAllowContentAccess(true);s.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);s.setSupportMultipleWindows(false);
         web.addJavascriptInterface(new Bridge(),"KeyuNative");
         web.setWebViewClient(new WebViewClient(){
+            @Override public void onPageFinished(WebView view,String url){pageReady=true;deliverSchoolResult();}
             @Override public WebResourceResponse shouldInterceptRequest(WebView view,WebResourceRequest req){
                 Uri u=req.getUrl();
                 if(!"https".equals(u.getScheme())||!"keyu.local".equals(u.getHost()))return new WebResourceResponse("text/plain","utf-8",403,"Blocked",null,new ByteArrayInputStream(new byte[0]));
@@ -63,6 +67,7 @@ public class MainActivity extends Activity {
     }
     void toast(String message){runOnUiThread(()->Toast.makeText(this,message,Toast.LENGTH_LONG).show());}
     class Bridge {
+        @JavascriptInterface public void openSchoolImport(){runOnUiThread(()->startActivityForResult(new Intent(MainActivity.this,SchoolImportActivity.class),13));}
         @JavascriptInterface public String getState(){return getSharedPreferences("keyu",0).getString("state","");}
         @JavascriptInterface public void saveState(String data){if(data.length()>8_000_000)throw new IllegalArgumentException("课表数据过大");if(!getSharedPreferences("keyu",0).edit().putString("state",data).commit())throw new IllegalStateException("无法写入课表");}
         @JavascriptInterface public void syncEvents(String data){getSharedPreferences("keyu",0).edit().putString("events",data).apply();ReminderReceiver.schedule(MainActivity.this);}
@@ -88,9 +93,11 @@ public class MainActivity extends Activity {
     @Override public void onRequestPermissionsResult(int code,String[] perms,int[] results){super.onRequestPermissionsResult(code,perms,results);if(code==12){if(results.length>0&&results[0]==PackageManager.PERMISSION_GRANTED)requestExact();else toast("通知权限未允许，可改用日历导出");}}
     @Override protected void onResume(){super.onResume();ReminderReceiver.schedule(this);if(web!=null)web.evaluateJavascript("window.keyuNativeStatus?.()",null);}
     @Override protected void onActivityResult(int req,int res,Intent data){super.onActivityResult(req,res,data);
+        if(req==13&&res==RESULT_OK){try(InputStream in=openFileInput(SchoolImportActivity.RESULT_FILE)){schoolResult=new String(SchoolImportActivity.readBytes(in),StandardCharsets.UTF_8);deliverSchoolResult();}catch(Exception e){toast("读取结果未能恢复，请重新导入。");}finally{deleteFile(SchoolImportActivity.RESULT_FILE);}}
         if(req==10&&picker!=null){picker.onReceiveValue(res==RESULT_OK&&data!=null?new Uri[]{data.getData()}:null);picker=null;}
         if(req==11&&exportBytes!=null){if(res==RESULT_OK&&data!=null)try(OutputStream o=getContentResolver().openOutputStream(data.getData())){if(o==null)throw new IOException();o.write(exportBytes);toast("文件已保存");}catch(Exception e){toast("保存失败，请重试");}exportBytes=null;}
     }
+    private void deliverSchoolResult(){if(pageReady&&schoolResult!=null){String result=schoolResult;schoolResult=null;web.evaluateJavascript("window.keyuSchoolImport("+org.json.JSONObject.quote(result)+")",null);}}
     @Override public void onBackPressed(){web.evaluateJavascript("document.getElementById('modal').hidden",value->{if("false".equals(value))web.evaluateJavascript("document.querySelector('[data-action=close]').click()",null);else finish();});}
     @Override protected void onDestroy(){if(picker!=null)picker.onReceiveValue(null);if(web!=null){web.removeJavascriptInterface("KeyuNative");web.destroy();}super.onDestroy();}
 }
