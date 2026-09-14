@@ -57,14 +57,26 @@ export function extractSchoolDocument(doc) {
 
 // Visit nested same-origin frames, without reading form values, scripts or cookies.
 export function readSchoolPage(root){
-  const stack=[{win:root,depth:0}],visited=new Set(),stats={version:'1.1.1',documents:0,blockedFrames:0,tables:0,nestedTables:0,weekdayCells:0,cards:0,maxDepth:0},errors=[];
+  const stack=[{win:root,depth:0}],visited=new Set(),framePages=[],stats={version:'1.1.2',documents:0,blockedFrames:0,tables:0,nestedTables:0,weekdayCells:0,cards:0,maxDepth:0,frameOrigins:[]},errors=[];
   while(stack.length){
     const {win,depth}=stack.shift();if(visited.has(win)||depth>6)continue;visited.add(win);
     try{
       const doc=win.document;stats.documents++;stats.maxDepth=Math.max(depth,stats.maxDepth);stats.tables+=doc.querySelectorAll('table').length;stats.nestedTables+=doc.querySelectorAll('table table').length;stats.weekdayCells+=[...doc.querySelectorAll('th,td')].filter(n=>/^(星期|周)[一二三四五六日天]/.test(n.textContent.replace(/\s/g,''))).length;stats.cards+=doc.querySelectorAll('.timetable_con').length;
       try{return extractSchoolDocument(doc);}catch(e){errors.push(String(e.message));}
+      // The embedding element's src is accessible even when its document is not.
+      // Keep URLs only in memory for native navigation; diagnostics contain origins only.
+      for(const frame of doc.querySelectorAll('iframe,frame')){
+        try{void frame.contentWindow.document;}catch{
+          try{
+            const url=new URL(frame.getAttribute('src')||'',doc.baseURI),r=frame.getBoundingClientRect(),style=win.getComputedStyle(frame);
+            if(!['http:','https:'].includes(url.protocol))continue;
+            if(!stats.frameOrigins.includes(url.origin))stats.frameOrigins.push(url.origin);
+            if(frame.hasAttribute('src')&&!frame.hasAttribute('srcdoc')&&r.width>=160&&r.height>=100&&style.display!=='none'&&style.visibility!=='hidden'&&style.opacity!=='0'&&!url.username&&!url.password&&url.hostname.endsWith('.scut.edu.cn')&&!framePages.some(p=>p.url===url.href))framePages.push({url:url.href,area:r.width*r.height});
+          }catch{}
+        }
+      }
       for(let i=0;i<win.frames.length;i++)stack.push({win:win.frames[i],depth:depth+1});
     }catch{stats.blockedFrames++;}
   }
-  return {error:errors[0]||'课表内嵌页面无法读取，请使用学校输出的 PDF 导入。',diagnostic:JSON.stringify(stats)};
+  return {error:errors[0]||'课表内嵌页面无法读取，请使用学校输出的 PDF 导入。',diagnostic:JSON.stringify(stats),framePages:framePages.sort((a,b)=>b.area-a.area).slice(0,8).map(p=>p.url)};
 }
