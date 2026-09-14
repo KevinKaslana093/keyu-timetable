@@ -67,7 +67,7 @@ public class SchoolImportActivity extends Activity {
     private void capture(){
         Uri u=Uri.parse(browser.getUrl()==null?"":browser.getUrl());if(!readable(u)||importing)return;
         importing=true;read.setEnabled(false);final int version=navigation;
-        String script=reader+"\n;(function(){try{return JSON.stringify(KeyuSchoolReader.readSchoolPage(window));}catch(e){return JSON.stringify({error:String(e.message),diagnostic:'reader-runtime-1.1.3'});}})()";
+        String script=reader+"\n;(function(){try{return JSON.stringify(KeyuSchoolReader.readSchoolPage(window));}catch(e){return JSON.stringify({error:String(e.message),diagnostic:'reader-runtime-1.1.4'});}})()";
         browser.evaluateJavascript(script,value->{
             importing=false;read.setEnabled(true);
             if(version!=navigation){status.setText("页面已变化，请等待加载完成后重新读取。");return;}
@@ -82,7 +82,7 @@ public class SchoolImportActivity extends Activity {
         });
     }
     private void showReadFailure(JSONObject result,int version){
-        String message=result.optString("error"),diagnostic=result.optString("diagnostic","reader-1.1.3");
+        String message=result.optString("error"),diagnostic=result.optString("diagnostic","reader-1.1.4");
         java.util.ArrayList<String> candidates=new java.util.ArrayList<>();JSONArray frames=result.optJSONArray("framePages");
         if(frames!=null&&openedFrames.size()<3)for(int i=0;i<frames.length();i++){String url=frames.optString(i);if(url.length()<=8192&&schoolFrame(Uri.parse(url))&&!openedFrames.contains(url)&&!candidates.contains(url))candidates.add(url);}
         if(!candidates.isEmpty())message="页面中有独立的学校内页，当前读取器无法跨页面读取。可以保留登录状态打开内页，确认学期和课程后再次读取。";
