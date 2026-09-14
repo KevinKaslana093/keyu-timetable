@@ -2,7 +2,9 @@
 
 本地导入课表、按周查看、离线保存。独立开发，不隶属 WakeUp 或华南理工大学。
 
-> 当前为开发体验版。源码和网页构建已完成；Android 编译、签名、真机验证与公网发布状态见 [验证记录](docs/VALIDATION.md)。不要把待验证项目描述为已适配全部手机。
+> 当前为开源体验版，各品牌真机兼容性仍需验证。已通过的检查与待测项见 [验证记录](docs/VALIDATION.md)。
+
+[浏览器版](https://kevinkaslana093.github.io/keyu-timetable/) · [下载 Android APK](https://github.com/KevinKaslana093/keyu-timetable/releases)
 
 ## 使用
 

@@ -13,7 +13,7 @@
 
 ## 尚未通过 / 尚未执行
 
-- 真实浏览器交互与手机截图：受限 Windows 环境中 Chrome GPU / 渲染进程失败，未完成，不能标记已通过。
+- 浏览器检查已完成，见下方记录。
 - Android Gradle 编译、安装、签名校验：本机无已配置 JDK / Android SDK；后续受限权限阻止联网构建和 GitHub 登录读取，未生成 APK。
 - GitHub 仓库创建、推送、Actions 构建、Pages 和 Release：尚未执行成功，不能把预期 URL 当成可用链接。
 - 各品牌 Android / iOS Safari / 华为浏览器真机测试：未执行。
@@ -43,3 +43,9 @@
 3. 同一签名覆盖安装后检查课程、设置与调休；保留签名密钥安全备份。
 4. 验证 Pages 的所有 PDF 资源可加载，首次缓存完成后断网刷新。
 5. 各机型记录系统版本、WebView 版本和失败步骤；敏感课表请脱敏后再反馈。
+
+## 浏览器追加记录
+
+2026-09-14 恢复运行权限后，Chrome 实测通过：真实 PDF 文件选择、20 条预览、确认导入、刷新后持久化、课程搜索、手动添加、1440px 桌面与 390px 手机布局；零 JavaScript 异常、无整页横向溢出。Playwright 初始界面快照通过。截图使用虚构示例。
+
+发布扫描中的两处 PDF.js worker“疑似密码”实际是 `password=this.hasFieldFlag` 和 `password:this.data.password`，均为 PDF 字段属性代码，不是凭据。产物与安装的官方 PDF.js worker 字节一致（SHA-256：88b29a656ecf0b104c2ef1b620be099c523be2a57f27fbb8a42bdac6b8c9a4c0）。已人工核定为误报。

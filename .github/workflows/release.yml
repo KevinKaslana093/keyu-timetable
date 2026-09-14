@@ -43,4 +43,4 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           cp android/app/build/outputs/apk/release/app-release.apk keyu-1.0.0.apk
-          gh release create v1.0.0 keyu-1.0.0.apk --prerelease --title '课屿 1.0.0 体验版' --notes-file docs/RELEASE.md
+          gh release create v1.0.0 keyu-1.0.0.apk --draft --prerelease --title '课屿 1.0.0 体验版' --notes-file docs/RELEASE.md
