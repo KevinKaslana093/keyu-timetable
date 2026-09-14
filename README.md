@@ -62,7 +62,7 @@ JDK 17、Android SDK 35、Gradle 8.11.1。先构建网页，再在 `android` 目
 
 ## 发布
 
-仓库启用 GitHub Pages 的 Actions 来源后，手动运行 Publish browser app 工作流。手动运行 Signed Android release 发布固定签名的体验版。发布前完成 [验证记录](docs/VALIDATION.md) 中待验证项。
+仓库启用 GitHub Pages 的 Actions 来源后，手动运行 Publish browser app 工作流。手动运行 Signed Android release 生成固定签名的体验版草稿，核验后公开。发布稳定版本前完成 [验证记录](docs/VALIDATION.md) 中的真机验收项。
 
 ## 文档
 

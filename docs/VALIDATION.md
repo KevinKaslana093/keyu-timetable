@@ -11,11 +11,11 @@
 - 网页生产构建成功，包含 PDF worker、中文 CMap、字体与离线缓存清单；无运行时 CDN 依赖。
 - 本地 HTTP 服务首页返回 200。
 
-## 尚未通过 / 尚未执行
+## 发布状态与待验证项
 
 - 浏览器检查已完成，见下方记录。
-- Android Gradle 编译与签名校验已通过。安装测试状态见后续追加记录。
-- GitHub 仓库、Actions 构建与 Pages 已上线，签名 APK 已生成。Release 在安装检查后转为公开体验版。
+- Android Gradle 编译与签名校验已通过。Android 15 模拟器安装、离线界面、强行停止后课表保留检查通过。
+- GitHub 仓库、Actions 构建与 Pages 已上线，签名 APK 已生成。Release 提供公开签名体验版。
 - 各品牌 Android / iOS Safari / 华为浏览器真机测试：未执行。
 - Android 锁屏通知、重启恢复、拒绝权限、精确闹钟授权、厂商省电、覆盖升级数据保留：已写实现，需真机验证。
 - ICS 在 Apple / 华为 / 小米等日历客户端的导入与重复导入行为：未真机验证。
@@ -27,7 +27,7 @@
 |---|---|---|---|
 | Android 8+ 且使用现代 System WebView | APK / 网页 | PDF、多页、中文、文件选择、导出 | 待测 |
 | Android 12+ | APK | 精确闹钟授权 / 拒绝、锁屏 | 待测 |
-| Android 13—15 | APK | 通知授权、手势导航、安全区 | 待测 |
+| Android 15 模拟器 | APK | 安装、离线界面、强停重启保留 | 已通过；通知与覆盖升级待测 |
 | HyperOS / ColorOS / OriginOS / One UI | APK / 网页 | 后台策略、文件 MIME、升级保留 | 待测 |
 | iOS / iPadOS Safari | 网页 | PDF worker、文件选择、主屏幕、安全区、ICS | 待测 |
 | 可运行 Android 应用的华为系统 | APK / 网页 | WebView、文件选择、后台限制 | 待测 |
@@ -36,7 +36,7 @@
 
 提醒不使用网页后台计时器。网页关闭后的通知可靠性不能用前台模拟器演示来证明。禁止宣称已适配“所有手机”。
 
-## 首次公开发行前检查
+## 后续真机验收清单
 
 1. 使用稳定签名生成 APK，验证签名和包名，测量实际安装包体积。
 2. 干净安装后导入虚构文件，关网启动，锁屏等待提醒，重启后再验证。
@@ -57,3 +57,9 @@ GitHub Pages 首页及静态资源可访问；Chrome 已实测生产 URL 加载�
 - 网站：https://kevinkaslana093.github.io/keyu-timetable/
 - 仓库：https://github.com/KevinKaslana093/keyu-timetable
 - 下载：https://github.com/KevinKaslana093/keyu-timetable/releases
+
+## 最终生产环境检查
+
+全新 Chrome 配置访问正式网站：XLSX 选择、预览和导入通过；等待离线缓存完成后，断网重新加载到新文档并恢复课程通过；保持断网选择真实 PDF，20 条时段解析预览通过。测试未将个人课表发布到网站。
+
+Android 15 状态栏避让使用原生容器布局处理，参考 [Android 官方 WebView 窗口边距说明](https://developer.android.com/develop/ui/views/layout/webapps/understand-window-insets)。
