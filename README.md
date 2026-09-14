@@ -6,6 +6,8 @@
 
 [浏览器版](https://kevinkaslana093.github.io/keyu-timetable/) · [下载 Android APK](https://github.com/KevinKaslana093/keyu-timetable/releases)
 
+![课屿桌面预览（虚构示例）](docs/screenshots/desktop.png)
+
 ## 使用
 
 1. 导入你自己的华工教务文字版 PDF，或符合七列表头的 XLSX / CSV / HTML。

@@ -14,12 +14,12 @@
 ## 尚未通过 / 尚未执行
 
 - 浏览器检查已完成，见下方记录。
-- Android Gradle 编译、安装、签名校验：本机无已配置 JDK / Android SDK；后续受限权限阻止联网构建和 GitHub 登录读取，未生成 APK。
-- GitHub 仓库创建、推送、Actions 构建、Pages 和 Release：尚未执行成功，不能把预期 URL 当成可用链接。
+- Android Gradle 编译与签名校验已通过。安装测试状态见后续追加记录。
+- GitHub 仓库、Actions 构建与 Pages 已上线，签名 APK 已生成。Release 在安装检查后转为公开体验版。
 - 各品牌 Android / iOS Safari / 华为浏览器真机测试：未执行。
 - Android 锁屏通知、重启恢复、拒绝权限、精确闹钟授权、厂商省电、覆盖升级数据保留：已写实现，需真机验证。
 - ICS 在 Apple / 华为 / 小米等日历客户端的导入与重复导入行为：未真机验证。
-- XLSX / HTML 文件选择至确认导入的完整 UI 流程：已实现，需浏览器验收。
+- XLSX / CSV / HTML 的文件选择、预览、单双周解析和持久化导入均已在 Chrome 实测通过。
 
 ## 设备验收矩阵
 
@@ -49,3 +49,11 @@
 2026-09-14 恢复运行权限后，Chrome 实测通过：真实 PDF 文件选择、20 条预览、确认导入、刷新后持久化、课程搜索、手动添加、1440px 桌面与 390px 手机布局；零 JavaScript 异常、无整页横向溢出。Playwright 初始界面快照通过。截图使用虚构示例。
 
 发布扫描中的两处 PDF.js worker“疑似密码”实际是 `password=this.hasFieldFlag` 和 `password:this.data.password`，均为 PDF 字段属性代码，不是凭据。产物与安装的官方 PDF.js worker 字节一致（SHA-256：88b29a656ecf0b104c2ef1b620be099c523be2a57f27fbb8a42bdac6b8c9a4c0）。已人工核定为误报。
+
+## 发布和离线检查
+
+GitHub Pages 首页及静态资源可访问；Chrome 已实测生产 URL 加载、首次完整缓存后断网刷新、示例课表持久化。XLSX 读取使用 read-excel-file 9 的 readSheet 接口，已用独立生成的标准 OOXML 文件验证。
+
+- 网站：https://kevinkaslana093.github.io/keyu-timetable/
+- 仓库：https://github.com/KevinKaslana093/keyu-timetable
+- 下载：https://github.com/KevinKaslana093/keyu-timetable/releases
