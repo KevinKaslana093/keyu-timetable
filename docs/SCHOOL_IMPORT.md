@@ -20,3 +20,10 @@
 - Chrome 中使用独立构造的虚构教务 DOM 验证 rowspan、多课程、周日、文本提取不包含密码表单、导入预览、两套校区设置持久化及网页版降级说明。
 - Android CI 使用拦截产生的虚构页面验证应用内读取流程，不将其描述为真实教务账号验证。结果以 Actions 的 Android installation smoke 为准。
 - 真实账号登录后网页布局、校园网/学校 VPN、厂商浏览器内核及后台提醒仍待用户手机验证。若学校页面改版，报错后保留原课表，使用 PDF 兜底。
+
+
+## 1.1.0 发布验收（2026-09-14）
+
+11 项单元测试通过；正式网站已验证教务 HTML 解析、导入预览和两套校区作息保存。Android 15 模拟器通过基础安装/重启，以及虚构网页读取 → 原生回传 → 预览 → 校区选择 → 本地保存全流程；学校窗口无 KeyuNative 接口。此测试使用拦截生成的虚构教务页面，**未使用真实学校账号登录**。真实教务 DOM、校园网环境及各厂商真机仍待验证。
+
+[Android 验证运行](https://github.com/KevinKaslana093/keyu-timetable/actions/runs/34794479083) · [签名构建](https://github.com/KevinKaslana093/keyu-timetable/actions/runs/34794482783) · [1.1.0 下载](https://github.com/KevinKaslana093/keyu-timetable/releases/tag/v1.1.0)

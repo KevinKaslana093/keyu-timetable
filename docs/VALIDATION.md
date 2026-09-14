@@ -63,3 +63,10 @@ GitHub Pages 首页及静态资源可访问；Chrome 已实测生产 URL 加载�
 全新 Chrome 配置访问正式网站：XLSX 选择、预览和导入通过；等待离线缓存完成后，断网重新加载到新文档并恢复课程通过；保持断网选择真实 PDF，20 条时段解析预览通过。测试未将个人课表发布到网站。
 
 Android 15 状态栏避让使用原生容器布局处理，参考 [Android 官方 WebView 窗口边距说明](https://developer.android.com/develop/ui/views/layout/webapps/understand-window-insets)。
+
+
+## 1.1.0 发布验收（2026-09-14）
+
+11 项单元测试通过；正式网站已验证教务 HTML 解析、导入预览和两套校区作息保存。Android 15 模拟器通过基础安装/重启，以及虚构网页读取 → 原生回传 → 预览 → 校区选择 → 本地保存全流程；学校窗口无 KeyuNative 接口。此测试使用拦截生成的虚构教务页面，**未使用真实学校账号登录**。真实教务 DOM、校园网环境及各厂商真机仍待验证。
+
+[Android 验证运行](https://github.com/KevinKaslana093/keyu-timetable/actions/runs/34794479083) · [签名构建](https://github.com/KevinKaslana093/keyu-timetable/actions/runs/34794482783) · [1.1.0 下载](https://github.com/KevinKaslana093/keyu-timetable/releases/tag/v1.1.0)
