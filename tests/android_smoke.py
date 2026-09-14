@@ -16,6 +16,15 @@ def wait_text(text,name):
         except subprocess.CalledProcessError:
             time.sleep(2)
             continue
+        # Cold-boot emulator launcher ANRs are unrelated to the app under test.
+        # Only dismiss this named system process; never dismiss a Keyu ANR.
+        if "Pixel Launcher isn't responding" in xml:
+            wait_button=next((node for node in ET.fromstring(xml).iter('node') if node.attrib.get('resource-id')=='android:id/aerr_wait'),None)
+            if wait_button is not None:
+                x1,y1,x2,y2=map(int,re.findall(r'\d+',wait_button.attrib['bounds']))
+                adb('shell','input','tap',str((x1+x2)//2),str((y1+y2)//2))
+                time.sleep(2)
+                continue
         if text in xml:return xml
         time.sleep(2)
     raise AssertionError('Screen did not contain '+text)
