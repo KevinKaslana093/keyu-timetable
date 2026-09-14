@@ -70,3 +70,12 @@ Android 15 状态栏避让使用原生容器布局处理，参考 [Android 官�
 11 项单元测试通过；正式网站已验证教务 HTML 解析、导入预览和两套校区作息保存。Android 15 模拟器通过基础安装/重启，以及虚构网页读取 → 原生回传 → 预览 → 校区选择 → 本地保存全流程；学校窗口无 KeyuNative 接口。此测试使用拦截生成的虚构教务页面，**未使用真实学校账号登录**。真实教务 DOM、校园网环境及各厂商真机仍待验证。
 
 [Android 验证运行](https://github.com/KevinKaslana093/keyu-timetable/actions/runs/34794479083) · [签名构建](https://github.com/KevinKaslana093/keyu-timetable/actions/runs/34794482783) · [1.1.0 下载](https://github.com/KevinKaslana093/keyu-timetable/releases/tag/v1.1.0)
+
+
+## 1.1.1：读取失败反馈修订
+
+用户在正确的个人课表表格页仍看到“请打开个人课表”提示。排查发现 1.1.0 存在严格星期标题匹配、跳过嵌套课程表格、仅探测一层框架、吞掉实际错误等限制。截图不足以确定该真实页面具体触发哪项，未取得真实 HTML，不宣称已复现该账号页面。
+
+修订支持附加日期标题、嵌套课程表格、多层同源框架和分离表头的列位置识别；错误不再统一替换成操作提示。失败时可复制仅含结构计数的诊断，不包含页面文本、账号、密码、Cookie。
+
+浏览器回归覆盖这些结构、几何列定位与无个人内容诊断；11 项单元测试通过。[Android 15 测试](https://github.com/KevinKaslana093/keyu-timetable/actions/runs/34812194376) 通过两层框架 + 嵌套表格 → 原生回传 → 预览 → 校区选择 → 保存。仍需用户在真实学校页面重试验证。
