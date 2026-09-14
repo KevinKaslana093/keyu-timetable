@@ -1,6 +1,6 @@
 {
   "name": "keyu-timetable",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Local-first timetable with SCUT PDF import and offline Android app",
   "main": "index.js",
   "directories": {

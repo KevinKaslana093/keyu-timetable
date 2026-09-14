@@ -58,14 +58,14 @@ public class SchoolImportActivity extends Activity {
     private void capture(){
         Uri u=Uri.parse(browser.getUrl()==null?"":browser.getUrl());if(!allowed(u)||!SCHOOL.equals(u.getHost())||importing)return;
         importing=true;read.setEnabled(false);final int version=navigation;
-        String script=reader+"\n;(function(){try { var docs=[document]; for(var i=0;i<frames.length;i++){try{if(frames[i].location.host===location.host)docs.push(frames[i].document);}catch(e){}} var result=null;for(var j=0;j<docs.length;j++){try{result=KeyuSchoolReader.extractSchoolDocument(docs[j]);break;}catch(e){}}if(!result)throw Error('请打开个人课表查询，选择学期、点击查询并切换表格后再读取。');return JSON.stringify(result);}catch(e){return JSON.stringify({error:String(e.message)});}})()";
+        String script=reader+"\n;(function(){try{return JSON.stringify(KeyuSchoolReader.readSchoolPage(window));}catch(e){return JSON.stringify({error:String(e.message),diagnostic:'reader-runtime-1.1.1'});}})()";
         browser.evaluateJavascript(script,value->{
             importing=false;read.setEnabled(true);
             if(version!=navigation){status.setText("页面已变化，请等待加载完成后重新读取。");return;}
             try{
                 Object decoded=new JSONTokener(value).nextValue();if(!(decoded instanceof String))throw new Exception("读取失败，请使用 PDF 导入。");String json=(String)decoded;
                 if(json.length()>500000)throw new Exception("页面内容过多，请只打开一个学期的课表。");
-                JSONObject result=new JSONObject(json);if(result.has("error"))throw new Exception(result.getString("error"));
+                JSONObject result=new JSONObject(json);if(result.has("error")){String message=result.getString("error"),diagnostic=result.optString("diagnostic","reader-1.1.1");status.setText(message);new android.app.AlertDialog.Builder(this).setTitle("课表读取未完成").setMessage(message+"\n\n可复制不含账号、密码或课程内容的结构诊断。") .setPositiveButton("复制诊断",(d,which)->{android.content.ClipboardManager clipboard=(android.content.ClipboardManager)getSystemService(CLIPBOARD_SERVICE);clipboard.setPrimaryClip(android.content.ClipData.newPlainText("课屿读取诊断",diagnostic));Toast.makeText(this,"诊断已复制，可粘贴反馈",Toast.LENGTH_LONG).show();}).setNegativeButton("继续查看",null).show();return;}
                 if(!"keyu-school-v1".equals(result.optString("format"))||result.getJSONArray("entries").length()==0)throw new Exception("没有找到课程。");
                 try(FileOutputStream out=openFileOutput(RESULT_FILE,MODE_PRIVATE)){out.write(json.getBytes(StandardCharsets.UTF_8));}
                 setResult(RESULT_OK);finish();

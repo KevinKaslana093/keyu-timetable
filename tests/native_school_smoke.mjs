@@ -13,11 +13,14 @@ const main=await connect(await wait(async()=>(await pages()).find(p=>p.url.start
 await main.evaluate("document.querySelector('[data-view=import]').click();document.querySelector('[data-action=school]').click()");
 const school=await connect(await wait(async()=>(await pages()).find(p=>!p.url.startsWith('https://keyu.local/'))));
 assert.equal(await school.evaluate('typeof KeyuNative'),'undefined');
-const fixture='<input type="password" value="never-import-this"><table><tr><th>节次</th>'+[...'一二三四五六日'].map(d=>'<th>星期'+d+'</th>').join('')+'</tr><tr><td>1-2</td><td><div class="timetable_con"><span class="title">虚构海洋学</span><p><i class="glyphicon-time"></i>(1-2节)3-7周(单)</p><p><i class="glyphicon-map-marker"></i>实验楼 A1</p><p><i class="glyphicon-user"></i>示例老师</p></div></td>'+('<td></td>'.repeat(6))+'</tr></table>';
+const originalFixture='<input type="password" value="never-import-this"><table><tr><th>节次</th>'+[...'一二三四五六日'].map(d=>'<th>星期'+d+'</th>').join('')+'</tr><tr><td>1-2</td><td><div class="timetable_con"><span class="title">虚构海洋学</span><p><i class="glyphicon-time"></i>(1-2节)3-7周(单)</p><p><i class="glyphicon-map-marker"></i>实验楼 A1</p><p><i class="glyphicon-user"></i>示例老师</p></div></td>'+('<td></td>'.repeat(6))+'</tr></table>';
+const escapeAttr=x=>x.replaceAll('&','&amp;').replaceAll('"','&quot;');
+const nestedTable=originalFixture.replace('<td><div class="timetable_con">','<td><table><tr><td><div class="timetable_con">').replace('</div></td>','</div></td></tr></table></td>').replaceAll(/<th>星期(.)<\/th>/g,'<th><span>星期$1</span><small>(9月14日)</small></th>');
+const fixture='<iframe srcdoc="'+escapeAttr('<iframe srcdoc="'+escapeAttr(nestedTable)+'"></iframe>')+'"></iframe>';
 school.handlers.set('Fetch.requestPaused',async p=>{await school.call('Fetch.fulfillRequest',{requestId:p.requestId,responseCode:200,responseHeaders:[{name:'Content-Type',value:'text/html; charset=utf-8'}],body:Buffer.from(fixture).toString('base64')});});
 await school.call('Fetch.enable',{patterns:[{urlPattern:'http://xsjw2018.jw.scut.edu.cn/kbcx/keyu-fixture',requestStage:'Request'}]});
 await school.call('Page.navigate',{url:'http://xsjw2018.jw.scut.edu.cn/kbcx/keyu-fixture'});
-await wait(()=>school.evaluate("document.body?.textContent.includes('虚构海洋学')"));
+await wait(()=>school.evaluate("document.querySelector('iframe')?.contentDocument.querySelector('iframe')?.contentDocument.body?.textContent.includes('虚构海洋学')"));
 function tapText(text){adb('shell','rm','-f','/sdcard/keyu-test.xml');adb('shell','uiautomator','dump','/sdcard/keyu-test.xml');const xml=adb('shell','cat','/sdcard/keyu-test.xml');const tag=xml.match(new RegExp('<node[^>]*text="'+text+'"[^>]*>'))?.[0];assert.ok(tag,'Native button missing: '+text);const b=tag.match(/bounds="\[(\d+),(\d+)\]\[(\d+),(\d+)\]"/).slice(1).map(Number);adb('shell','input','tap',String((b[0]+b[2])>>1),String((b[1]+b[3])>>1));}
 tapText('读取当前课表');
 await wait(()=>main.evaluate("document.querySelector('#import-form')!==null"));
@@ -27,5 +30,5 @@ await main.evaluate("document.querySelector('[name=importCampus]').value='univer
 const state=JSON.parse(await main.evaluate('KeyuNative.getState()'));const schedule=state.schedules.find(s=>s.id===state.active);
 assert.equal(schedule.courses[0].name,'虚构海洋学');assert.equal(schedule.slots[0],'08:50-09:35');assert.equal(schedule.courses[0].teacher,'示例老师');
 fs.writeFileSync('android-smoke-output/school-import.png',execFileSync('adb',['exec-out','screencap','-p']));
-console.log('PASS native school browser separation, intercepted fictional DOM -> native callback -> preview -> campus selection -> private persistence. No real school login performed.');
+console.log('PASS native school browser separation, depth-2 frame and nested table DOM -> native callback -> preview -> campus selection -> private persistence. No real school login performed.');
 main.close();school.close();

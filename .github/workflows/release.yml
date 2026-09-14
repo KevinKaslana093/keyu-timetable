@@ -42,10 +42,10 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp android/app/build/outputs/apk/release/app-release.apk keyu-1.1.0.apk
-          if gh release view v1.1.0 >/dev/null 2>&1; then
-            gh release upload v1.1.0 keyu-1.1.0.apk --clobber
-            gh release edit v1.1.0 --target "$GITHUB_SHA" --notes-file docs/RELEASE.md
+          cp android/app/build/outputs/apk/release/app-release.apk keyu-1.1.1.apk
+          if gh release view v1.1.1 >/dev/null 2>&1; then
+            gh release upload v1.1.1 keyu-1.1.1.apk --clobber
+            gh release edit v1.1.1 --target "$GITHUB_SHA" --notes-file docs/RELEASE.md
           else
-            gh release create v1.1.0 keyu-1.1.0.apk --target "$GITHUB_SHA" --draft --prerelease --title '课屿 1.1.0 体验版' --notes-file docs/RELEASE.md
+            gh release create v1.1.1 keyu-1.1.1.apk --target "$GITHUB_SHA" --draft --prerelease --title '课屿 1.1.1 体验版' --notes-file docs/RELEASE.md
           fi
