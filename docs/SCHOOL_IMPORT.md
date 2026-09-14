@@ -46,3 +46,13 @@
 11 项单元测试及浏览器结构回归通过。另用真实跨域的虚构页面验证诊断、隐藏框架排除、地址参数不进入诊断、内页直接读取。[Android 15 完整导入测试](https://github.com/KevinKaslana093/keyu-timetable/actions/runs/34814445135) 通过：跨域阻断 → 原生打开内页 → 两层同源框架和嵌套表格 → 预览 → 校区选择 → 本机保存；两处学校页面均无 KeyuNative 桥。签名 APK 构建与验证、网页部署均通过。生产网页的课程预览与两套校区作息回归通过。
 
 尚未使用用户真实登录页面验证，各品牌真机仍待反馈。网站检查首页与静态资源可达；社交分享 og:title/og:image 元数据检查仍未通过，与本次导入修复无关。隐私扫描命中已核实的 PDF.js 字段属性及文档中引用该属性的文字，无实际凭据。
+
+## 1.1.3：纠正 blockedFrames 误诊并兼容 DOM 集合
+
+1.1.2 的诊断在统计 weekdayCells 之前，已经取得 documents/tables/nestedTables，却没有 frameOrigins。检查发现：旧版外层 catch 将任意执行错误均计为 blockedFrames；因此此前按跨域分析证据不足。
+
+浏览器对照试验构造 12 张表、4 张嵌套表，并移除 DOM 集合迭代器。旧版输出与用户反馈相同的 documents=1 / blockedFrames=1 / tables=12 / nestedTables=4 / weekdayCells=0 / cards=0 / frameOrigins=[]，实际没有跨域框架；新版读取同一虚构课程成功。这验证了一种与反馈一致的根因，但尚未直接检查用户手机的页面运行环境。
+
+改用按索引复制 NodeList/HTMLCollection，不依赖 DOM 集合迭代器或 NodeList.forEach。仅文档访问的 SecurityError 计为 blockedFrames；其他错误仅记阶段和标准错误类型，诊断代码失败也不会跳过提取和子框架。诊断不包含异常原文。
+
+13 项单元测试、旧/新浏览器对照、嵌套表格和跨域回归通过。[Android 15 完整测试](https://github.com/KevinKaslana093/keyu-timetable/actions/runs/34857917916) 在移除 DOM 集合迭代支持后通过学校内页读取、预览、校区选择和保存。生产网页预览及两套校区时间回归通过，签名 APK 构建成功。仍需用户真实页面重试。
